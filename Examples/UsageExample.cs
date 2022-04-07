@@ -22,7 +22,7 @@ namespace Examples
             {
                 _manuallyRegisteredMonoService = ServiceLocator.Get<ManuallyRegisteredMonoService>();
             }
-            catch (ServiceLocatorException ex)
+            catch (ServiceLocatorException)
             {
                 Debug.Log($"Oh no, {nameof(ManuallyRegisteredMonoService)} wasn't registered :(!");
                 //Do some action
