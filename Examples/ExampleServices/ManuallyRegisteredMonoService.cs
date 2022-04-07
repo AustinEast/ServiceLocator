@@ -18,7 +18,7 @@ namespace Examples.ExampleServices
 
         public void RegisterMe()
         {
-            ServiceLocator.Register(this, true);
+            ServiceLocator.Register(this);
         }
     }
 }
