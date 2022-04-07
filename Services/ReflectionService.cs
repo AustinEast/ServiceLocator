@@ -12,7 +12,8 @@ namespace Services
         {
             return AppDomain.CurrentDomain
                 .GetAssemblies()
-                .SelectMany(assembly => assembly.GetTypesWithCustomAttribute<AutoRegisteredService>());
+                .SelectMany(assembly => assembly.GetTypesWithCustomAttribute<AutoRegisteredService>())
+                .Where(service => typeof(IRegistrable).IsAssignableFrom(service));
         }
     }
 }

@@ -27,26 +27,32 @@ namespace Services
             }
         }
 
-        public static void Register<TService>(TService service, bool safe = true) where TService : IServiceBase
+        public static void Register<TService>(TService service, bool safe = true) where TService : IRegistrable, new()
         {
             var serviceType = typeof(TService);
             if (IsRegistered<TService>() && safe)
             {
-                throw new Exception($"{serviceType.Name} has been already registered.");
+                throw new ServiceLocatorException($"{serviceType.Name} has been already registered.");
             }
 
             Services[typeof(TService)] = service;
         }
 
-        public static TService Get<TService>() where TService : IServiceBase
+        public static TService Get<TService>(bool forced = false) where TService : IRegistrable, new()
         {
             var serviceType = typeof(TService);
             if (IsRegistered<TService>())
             {
                 return (TService) Services[serviceType];
-            }
+            } 
+            if (!forced) 
+                throw new ServiceLocatorException($"{serviceType.Name} hasn't been registered.");
 
-            throw new Exception($"{serviceType.Name} hasn't been registered.");
+            var service = serviceType.IsMonoBehaviour() ? 
+                (TService) FindOrCreateMonoService(serviceType) : new TService();
+          
+            Register(service);
+            return service;
         }
 
         public static bool IsRegistered(Type t)
@@ -58,13 +64,14 @@ namespace Services
         {
             return IsRegistered(typeof(TService));
         }
+        
 
         private static void RegisterNewInstance(Type serviceType)
         {
             Services[serviceType] = Activator.CreateInstance(serviceType);
         }
         
-        private static void FindOrCreateMonoService(Type serviceType)
+        private static object FindOrCreateMonoService(Type serviceType)
         {
             var inGameService = FindObjectOfType(serviceType);
             if (inGameService == null)
@@ -72,9 +79,16 @@ namespace Services
                 var newObject = new GameObject();
                 newObject.AddComponent(serviceType);
                 newObject.name = serviceType.Name;
-                inGameService = FindObjectOfType(serviceType); 
+                inGameService = newObject.GetComponent(serviceType);
             }
             Services[serviceType] = inGameService;
+            return inGameService;
         }
     }
+    
+    public class ServiceLocatorException : Exception
+    {
+        public ServiceLocatorException(string message) : base(message) {}
+    }
+
 }
