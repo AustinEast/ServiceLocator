@@ -1,0 +1,10 @@
+{
+  "name": "ServiceLocator",
+  "version": "0.1.0",
+  "displayName": "Service Locator",
+  "description": "This is an example package",
+  "author": {
+    "name": "x1r15",
+    "url": "https://github.com/x1r15/ServiceLocator"
+  }
+}
